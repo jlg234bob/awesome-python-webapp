@@ -7,7 +7,9 @@ A simple, lightweight, WSGI-compatible web framework.
 
 __author__ = 'Michael Liao'
 
-import types, os, re, cgi, sys, time, datetime, functools, mimetypes, threading, logging, urllib, traceback
+import types, os, re, cgi, sys, datetime, functools, threading, logging, urllib, traceback
+from mimetypes import types_map
+
 
 try:
     from cStringIO import StringIO
@@ -578,7 +580,7 @@ class StaticFileRoute(object):
         if not os.path.isfile(fpath):
             raise notfound()
         fext = os.path.splitext(fpath)[1]
-        ctx.response.content_type = mimetypes.types_map.get(fext.lower(), 'application/octet-stream')
+        ctx.response.content_type = types_map.get(fext.lower(), 'application/octet-stream')
         return _static_file_generator(fpath)
 
 def favicon_handler():
@@ -1250,7 +1252,7 @@ def _default_error_handler(e, start_response, is_debug):
     logging.exception('Exception:')
     start_response('500 Internal Server Error', [('Content-Type', 'text/html'), _HEADER_X_POWERED_BY])
     if is_debug:
-        return _debug()
+        return '_debug()'
     return ('<html><body><h1>500 Internal Server Error</h1><h3>%s</h3></body></html>' % str(e))
 
 def view(path):
@@ -1489,7 +1491,7 @@ class WSGIApplication(object):
                 raise notfound()
             raise badrequest()
 
-        fn_exec = _build_interceptor_chain(fn_route, *self._interceptors)
+            
 
         def wsgi(env, start_response):
             ctx.application = _application
